@@ -1,154 +1,108 @@
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated } from 'react-native';
-import { useState, useEffect, useRef } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { COLORS } from './constants/theme';
+import OnboardingScreen from './screens/OnboardingScreen';
+import AuthScreen from './screens/AuthScreen';
+import AppNavigator from './navigation';
+import { Property } from './constants/mockData';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [theme, setTheme] = useState('light');
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
-
-  useEffect(() => {
-    // Fade in animation when component mounts
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 4,
-        tension: 40,
-        useNativeDriver: true,
-      })
-    ]).start();
+  const [appState, setAppState] = useState<'onboarding' | 'auth' | 'app'>('onboarding');
+  const [userType, setUserType] = useState<'buyer' | 'agent' | null>(null);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  
+  // Load fonts
+  const [fontsLoaded] = useFonts({
+    'Inter-Regular': require('./assets/fonts/Inter-Regular.ttf'),
+    'Inter-Medium': require('./assets/fonts/Inter-Medium.ttf'),
+    'Inter-SemiBold': require('./assets/fonts/Inter-SemiBold.ttf'),
+    'Inter-Bold': require('./assets/fonts/Inter-Bold.ttf'),
   });
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
+  
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Pre-load fonts, make any API calls you need to do here
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setIsReady(true);
+      }
+    }
+    
+    prepare();
+  }, []);
+  
+  useEffect(() => {
+    if (isReady && fontsLoaded) {
+      // Hide splash screen
+      SplashScreen.hideAsync();
+    }
+  }, [isReady, fontsLoaded]);
+  
+  if (!isReady || !fontsLoaded) {
+    return null;
+  }
+  
+  const handleGetStarted = () => {
+    setAppState('auth');
   };
-
-  const logoSource = theme === 'light' 
-    ? require('./assets/images/appacella-logo-blue.png')
-    : require('./assets/images/appacella-logo-white.png');
-
+  
+  const handleLogin = () => {
+    setAppState('app');
+    setUserType('buyer'); // Default to buyer for demo
+  };
+  
+  const handleBack = () => {
+    if (appState === 'auth') {
+      setAppState('onboarding');
+    } else if (selectedProperty) {
+      setSelectedProperty(null);
+    }
+  };
+  
+  const handlePropertyPress = (property: Property) => {
+    setSelectedProperty(property);
+  };
+  
+  const handleAIAssistantPress = () => {
+    console.log('AI Assistant pressed');
+  };
+  
+  const handleAddProperty = () => {
+    console.log('Add property pressed');
+  };
+  
   return (
-    <View style={[
-      styles.container,
-      { backgroundColor: theme === 'light' ? '#f0f8ff' : '#1a1a2e' }
-    ]}>
-      <Animated.View style={[
-        styles.content,
-        { 
-          opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }]
-        }
-      ]}>
-        <Image 
-          source={logoSource} 
-          style={styles.logo} 
-          resizeMode="contain"
-        />
-        
-        <Text style={[
-          styles.title,
-          { color: theme === 'light' ? '#333' : '#fff' }
-        ]}>
-          Welcome to Kiki
-        </Text>
-        
-        <Text style={[
-          styles.subtitle,
-          { color: theme === 'light' ? '#666' : '#ccc' }
-        ]}>
-          Tell the AI what to make!
-        </Text>
-
-        <View style={styles.reactContainer}>
-          <Text style={[
-            styles.poweredBy,
-            { color: theme === 'light' ? '#666' : '#ccc' }
-          ]}>
-            Powered by
-          </Text>
-          <Image 
-            source={require('./assets/images/react-logo.png')} 
-            style={styles.reactLogo} 
-            resizeMode="contain"
-          />
-        </View>
-      </Animated.View>
-
-      <TouchableOpacity 
-        style={[
-          styles.themeToggle,
-          { backgroundColor: theme === 'light' ? '#333' : '#f0f8ff' }
-        ]} 
-        onPress={toggleTheme}
-      >
-        <Text style={{ 
-          color: theme === 'light' ? '#fff' : '#333',
-          fontWeight: 'bold'
-        }}>
-          {theme === 'light' ? '🌙' : '☀️'}
-        </Text>
-      </TouchableOpacity>
+    <SafeAreaProvider>
+      <StatusBar style="light" backgroundColor={COLORS.background.dark} />
       
-      <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
-    </View>
+      {appState === 'onboarding' && (
+        <OnboardingScreen onGetStarted={handleGetStarted} />
+      )}
+      
+      {appState === 'auth' && (
+        <AuthScreen onLogin={handleLogin} onBack={handleBack} />
+      )}
+      
+      {appState === 'app' && (
+        <AppNavigator
+          userType={userType}
+          onPropertyPress={handlePropertyPress}
+          onAIAssistantPress={handleAIAssistantPress}
+          onAddProperty={handleAddProperty}
+          onBack={handleBack}
+        />
+      )}
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  content: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  logo: {
-    width: 200,
-    height: 100,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 18,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  reactContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 40,
-  },
-  poweredBy: {
-    fontSize: 14,
-    marginRight: 6,
-  },
-  reactLogo: {
-    width: 24,
-    height: 24,
-  },
-  themeToggle: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    padding: 10,
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
