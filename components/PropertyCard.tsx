@@ -8,7 +8,7 @@ import {
   ViewStyle,
   Dimensions
 } from 'react-native';
-import { Heart, Bed, Bath, SquareFoot } from 'lucide-react-native';
+import { Heart, Bed, Bath, Square } from 'lucide-react-native';
 import { LinearGradient } from 'react-native-linear-gradient';
 import { COLORS, SHADOWS } from '../constants/theme';
 import { scale, moderateScale } from '../utils/scaling';
@@ -124,7 +124,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </View>
           
           <View style={styles.featureItem}>
-            <SquareFoot size={16} color={COLORS.text.secondary} />
+            <Square size={16} color={COLORS.text.secondary} />
             <Text style={styles.featureText}>{property.features.area} ft²</Text>
           </View>
         </View>

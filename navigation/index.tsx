@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Home, Search, Heart, User, Plus } from 'lucide-react-native';
 import { COLORS } from '../constants/theme';
 import { scale } from '../utils/scaling';
@@ -33,8 +34,6 @@ type AgentTabParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const BuyerTab = createBottomTabNavigator<BuyerTabParamList>();
 const AgentTab = createBottomTabNavigator<AgentTabParamList>();
-
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 interface NavigationProps {
   userType: 'buyer' | 'agent' | null;

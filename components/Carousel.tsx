@@ -36,10 +36,10 @@ const Carousel: React.FC<CarouselProps> = ({
   const flatListRef = useRef<FlatList>(null);
   
   React.useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: NodeJS.Timeout | null = null;
     
     if (autoPlay && images.length > 1) {
-      timer = setInterval(() => {
+      timer = setTimeout(() => {
         if (activeIndex === images.length - 1) {
           flatListRef.current?.scrollToIndex({
             index: 0,
@@ -51,12 +51,12 @@ const Carousel: React.FC<CarouselProps> = ({
             animated: true,
           });
         }
-      }, interval);
+      }, interval) as unknown as NodeJS.Timeout;
     }
     
     return () => {
       if (timer) {
-        clearInterval(timer);
+        clearTimeout(timer);
       }
     };
   }, [activeIndex, autoPlay, images.length, interval]);
@@ -74,7 +74,7 @@ const Carousel: React.FC<CarouselProps> = ({
       <View style={styles.paginationContainer}>
         {images.map((_, index) => (
           <View
-            key={index}
+            key={`dot-${index}`}
             style={[
               styles.paginationDot,
               index === activeIndex && styles.paginationDotActive,

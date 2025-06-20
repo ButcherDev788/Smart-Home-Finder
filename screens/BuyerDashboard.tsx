@@ -151,7 +151,7 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
               contentContainerStyle={styles.propertyListContent}
             >
               {[1, 2, 3].map(i => (
-                <View key={i} style={{ marginRight: scale(16) }}>
+                <View key={`featured-shimmer-${i}`} style={{ marginRight: scale(16) }}>
                   {renderPropertyShimmer()}
                 </View>
               ))}
@@ -178,7 +178,7 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
               contentContainerStyle={styles.propertyListContent}
             >
               {[1, 2, 3].map(i => (
-                <View key={i} style={{ marginRight: scale(16) }}>
+                <View key={`new-shimmer-${i}`} style={{ marginRight: scale(16) }}>
                   {renderPropertyShimmer()}
                 </View>
               ))}

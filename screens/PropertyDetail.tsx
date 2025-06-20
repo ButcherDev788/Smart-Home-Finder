@@ -15,7 +15,7 @@ import {
   Share2, 
   Bed, 
   Bath, 
-  SquareFoot, 
+  Square, 
   Calendar, 
   MapPin,
   Phone,
@@ -158,7 +158,7 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({
             </View>
             
             <View style={styles.featureCard}>
-              <SquareFoot size={24} color={COLORS.accent.primary} />
+              <Square size={24} color={COLORS.accent.primary} />
               <Text style={styles.featureValue}>{property.features.area}</Text>
               <Text style={styles.featureLabel}>Sq Ft</Text>
             </View>
@@ -179,7 +179,7 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({
             <Text style={styles.sectionTitle}>Amenities</Text>
             <View style={styles.amenitiesContainer}>
               {property.amenities.map((amenity, index) => (
-                <View key={index} style={styles.amenityItem}>
+                <View key={`amenity-${index}`} style={styles.amenityItem}>
                   <View style={styles.amenityDot} />
                   <Text style={styles.amenityText}>{amenity}</Text>
                 </View>
@@ -191,7 +191,7 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({
             <Text style={styles.sectionTitle}>Nearby</Text>
             <View style={styles.nearbyContainer}>
               {property.nearbyPlaces.map((place, index) => (
-                <View key={index} style={styles.nearbyItem}>
+                <View key={`nearby-${index}`} style={styles.nearbyItem}>
                   <Text style={styles.nearbyIcon}>{place}</Text>
                 </View>
               ))}
